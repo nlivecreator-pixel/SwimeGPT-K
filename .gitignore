@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.env
+.openrouter
+model/*.pt
+model/*.gguf
+venv/
+.venv/
+*.egg
