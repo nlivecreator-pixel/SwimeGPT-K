@@ -62,6 +62,20 @@ python train.py data
 
 Чекпоинты сохраняются в `model/swimegpt_epoch{N}.pt`.
 
+### 2.5. Квантование модели (опционально)
+
+Уменьшите размер модели для ускорения инференса и снижения потребления памяти:
+
+```bash
+# INT8 квантование (~4x меньше, минимальная потеря качества)
+python quantize.py model/swimegpt_epoch1.pt int8
+
+# INT4 квантование (~8x меньше, умеренная потеря качества)
+python quantize.py model/swimegpt_epoch1.pt int4
+```
+
+Квантованные модели сохраняются как `model/swimegpt_quantized_int8.pt` или `int4.pt` и автоматически работают с `chat.py` и `api.py`.
+
 ### 3. Чат с моделью
 
 ```bash
@@ -102,6 +116,7 @@ SwimeGPT-K1.2/
 ├── train.py                  # Скрипт обучения, модель SwimeGPT
 ├── chat.py                   # Интерактивный чат CLI
 ├── api.py                    # REST сервер на FastAPI
+├── quantize.py               # Квантование модели (INT8/INT4)
 ├── generate_syntax_data.py   # Отдельный скрипт генерации данных
 ├── requirements.txt          # Зависимости Python
 ├── tools/

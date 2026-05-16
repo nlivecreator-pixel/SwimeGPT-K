@@ -62,6 +62,20 @@ python train.py data
 
 Checkpoints are saved to `model/swimegpt_epoch{N}.pt`.
 
+### 2.5. Quantize the Model (Optional)
+
+Reduce model size for faster inference and lower memory usage:
+
+```bash
+# INT8 quantization (~4x smaller, minimal quality loss)
+python quantize.py model/swimegpt_epoch1.pt int8
+
+# INT4 quantization (~8x smaller, moderate quality loss)
+python quantize.py model/swimegpt_epoch1.pt int4
+```
+
+Quantized models are saved as `model/swimegpt_quantized_int8.pt` or `int4.pt` and work automatically with `chat.py` and `api.py`.
+
 ### 3. Chat with the Model
 
 ```bash
@@ -102,6 +116,7 @@ SwimeGPT-K1.2/
 ├── train.py                  # Training script with SwimeGPT model
 ├── chat.py                   # Interactive chat CLI
 ├── api.py                    # FastAPI REST server
+├── quantize.py               # Model quantization (INT8/INT4)
 ├── generate_syntax_data.py   # Standalone data generation script
 ├── requirements.txt          # Python dependencies
 ├── tools/

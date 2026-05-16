@@ -255,19 +255,33 @@ def load_model(checkpoint_path=None):
 
     from train import SwimeGPT, VOCAB_SIZE, HIDDEN_DIM, NUM_HEADS, NUM_LAYERS, MAX_SEQ_LEN, SLIDING_WINDOW
 
-    model = SwimeGPT(
-        vocab_size=VOCAB_SIZE,
-        hidden_dim=HIDDEN_DIM,
-        num_heads=NUM_HEADS,
-        num_layers=NUM_LAYERS,
-        max_seq_len=MAX_SEQ_LEN,
-        sliding_window=SLIDING_WINDOW
-    )
+    is_quantized = "quantized_state_dict" in checkpoint
 
-    model.load_state_dict(checkpoint['model_state_dict'])
-    model.eval()
+    if is_quantized:
+        from quantize import load_quantized_model
+        model_config = {
+            "vocab_size": VOCAB_SIZE,
+            "hidden_dim": HIDDEN_DIM,
+            "num_heads": NUM_HEADS,
+            "num_layers": NUM_LAYERS,
+            "max_seq_len": MAX_SEQ_LEN,
+            "sliding_window": SLIDING_WINDOW
+        }
+        model, quant_config = load_quantized_model(checkpoint_path, SwimeGPT, model_config)
+        print(f"{COLORS['info']}Quantized model loaded! Type: {quant_config['quant_type']}{Style.RESET_ALL}")
+    else:
+        model = SwimeGPT(
+            vocab_size=VOCAB_SIZE,
+            hidden_dim=HIDDEN_DIM,
+            num_heads=NUM_HEADS,
+            num_layers=NUM_LAYERS,
+            max_seq_len=MAX_SEQ_LEN,
+            sliding_window=SLIDING_WINDOW
+        )
+        model.load_state_dict(checkpoint['model_state_dict'])
+        model.eval()
+        print(f"{COLORS['info']}Model loaded! Config: {checkpoint['config']}{Style.RESET_ALL}")
 
-    print(f"{COLORS['info']}Model loaded! Config: {checkpoint['config']}{Style.RESET_ALL}")
     return model
 
 

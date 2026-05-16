@@ -42,17 +42,32 @@ def load_model():
 
     checkpoint = torch.load(max(checkpoints, key=lambda p: p.stat().st_mtime), map_location="cpu")
 
-    model = SwimeGPT(
-        vocab_size=VOCAB_SIZE,
-        hidden_dim=HIDDEN_DIM,
-        num_heads=NUM_HEADS,
-        num_layers=NUM_LAYERS,
-        max_seq_len=MAX_SEQ_LEN,
-        sliding_window=SLIDING_WINDOW
-    )
+    is_quantized = "quantized_state_dict" in checkpoint
 
-    model.load_state_dict(checkpoint['model_state_dict'])
-    model.eval()
+    if is_quantized:
+        from quantize import load_quantized_model
+        model_config = {
+            "vocab_size": VOCAB_SIZE,
+            "hidden_dim": HIDDEN_DIM,
+            "num_heads": NUM_HEADS,
+            "num_layers": NUM_LAYERS,
+            "max_seq_len": MAX_SEQ_LEN,
+            "sliding_window": SLIDING_WINDOW
+        }
+        model, quant_config = load_quantized_model(checkpoint_path, SwimeGPT, model_config)
+        print(f"SwimeGPT quantized model loaded (type: {quant_config['quant_type']})")
+    else:
+        model = SwimeGPT(
+            vocab_size=VOCAB_SIZE,
+            hidden_dim=HIDDEN_DIM,
+            num_heads=NUM_HEADS,
+            num_layers=NUM_LAYERS,
+            max_seq_len=MAX_SEQ_LEN,
+            sliding_window=SLIDING_WINDOW
+        )
+        model.load_state_dict(checkpoint['model_state_dict'])
+        model.eval()
+        print("SwimeGPT model loaded successfully")
 
     return model, tokenizer
 
